@@ -1,15 +1,30 @@
 package com.example.demo;
 
-import java.util.ArrayList;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
 class BooksRepository {
-    private static ArrayList<Book> books = new ArrayList<Book>();
+    private final EntityManager entityManager;
+//    private static ArrayList<Book> books = new ArrayList<Book>();
 
-    public static ArrayList<Book> getBooks() {
-        return books;
+    @Transactional
+    public List<Book> getBooks() {
+        return entityManager.createQuery("FROM Book", Book.class).getResultList();
     }
 
-    public static void addBook(Book book){
-      books.add(book);
+    @Transactional
+    public Book addBook(Book book){
+        Book bookEntity = new Book();
+        bookEntity.setBookName(book.getBookName());
+        bookEntity.setIsbn(book.getIsbn());
+        bookEntity.setBookAuthor(book.getBookAuthor());
+
+        return entityManager.merge(bookEntity);
     }
 }
